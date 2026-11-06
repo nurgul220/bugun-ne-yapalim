@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../data/models/activity_model.dart';
+import 'activity_detail_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -12,13 +14,37 @@ class _HomeViewState extends State<HomeView> {
   double _budget = 100;
   String _selectedLocation = 'Evde';
 
+  void _onFindActivityPressed() {
+    // Şimdilik test için kullanıcının seçtiği filtrelere göre örnek bir aktivite üretiyoruz
+    final sampleActivity = ActivityModel(
+      id: '1',
+      title: _selectedLocation == 'Evde'
+          ? 'Evde Gurme Nacho & Mini Sinema Gecesi'
+          : 'Şehir Parkında Fotoğraf Avı & Kahve Yürüyüşü',
+      description: _selectedLocation == 'Evde'
+          ? 'Evdeki malzemelerle çıtır atıştırmalıklar hazırlayın ve arkadaşlarınızla rastgele seçilen ödüllü bir kısa film izleyin!'
+          : 'Belirlediğiniz bütçeyle en sevdiğiniz kahveyi alıp çevrenizdeki 5 ilginç nesnenin fotoğrafını çekin.',
+      category: _selectedLocation == 'Evde'
+          ? 'Eğlence & Mutfak'
+          : 'Açık Hava & Keşif',
+      participantCount: _selectedPersonCount,
+      minBudget: _budget.round(),
+      estimatedMinutes: 45,
+    );
+
+    // Detay sayfasına geçiş yap
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ActivityDetailView(activity: sampleActivity),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bugün Ne Yapalım?'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Bugün Ne Yapalım?'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -36,7 +62,10 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(height: 24),
 
             // Kişi Sayısı Seçimi
-            const Text('Kişi Sayısı', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Kişi Sayısı',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [1, 2, 3, 4, 5].map((count) {
@@ -47,7 +76,8 @@ class _HomeViewState extends State<HomeView> {
                     label: Text(count == 5 ? '5+' : '$count Kişi'),
                     selected: isSelected,
                     onSelected: (selected) {
-                      if (selected) setState(() => _selectedPersonCount = count);
+                      if (selected)
+                        setState(() => _selectedPersonCount = count);
                     },
                   ),
                 );
@@ -55,8 +85,11 @@ class _HomeViewState extends State<HomeView> {
             ),
             const SizedBox(height: 24),
 
-            // Ortam Seçimi
-            const Text('Mekân Tercihi', style: TextStyle(fontWeight: FontWeight.bold)),
+            // Mekân Seçimi
+            const Text(
+              'Mekân Tercihi',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Row(
               children: ['Evde', 'Dışarıda', 'Farketmez'].map((loc) {
@@ -76,8 +109,10 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(height: 24),
 
             // Bütçe Slider
-            Text('Maksimum Bütçe: ${_budget.round()} TL',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              'Maksimum Bütçe: ${_budget.round()} TL',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             Slider(
               value: _budget,
               min: 0,
@@ -95,17 +130,12 @@ class _HomeViewState extends State<HomeView> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '$_selectedPersonCount kişi için $_selectedLocation ortamında ${_budget.round()} TL bütçeli aktivite aranıyor...',
-                      ),
-                    ),
-                  );
-                },
+                onPressed: _onFindActivityPressed,
                 icon: const Icon(Icons.auto_awesome),
-                label: const Text('Bana Aktivite Öner', style: TextStyle(fontSize: 16)),
+                label: const Text(
+                  'Bana Aktivite Öner',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ],
